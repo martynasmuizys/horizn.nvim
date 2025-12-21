@@ -4,17 +4,17 @@ local hl = require("horizn.highlights").groups
 
 local M = {}
 
-function M.setup(grp)
+function M.setup()
 	local grp = vim.api.nvim_create_augroup("HoriznGroup", { clear = false })
 	-- idk if needed
-	vim.api.nvim_create_autocmd({ "DirChanged" }, {
-		group = grp,
-		callback = function(args)
-			if vim.api.nvim_buf_is_valid(args.buf) then
-				s.state[args.buf].git_branch = M.get_branch()
-			end
-		end,
-	})
+	-- vim.api.nvim_create_autocmd({ "DirChanged" }, {
+	-- 	group = grp,
+	-- 	callback = function(args)
+	-- 		if vim.api.nvim_buf_is_valid(args.buf) then
+	-- 			s.state[args.buf].git_branch = M.get_branch()
+	-- 		end
+	-- 	end,
+	-- })
 end
 
 function M.get_branch()
@@ -22,7 +22,7 @@ function M.get_branch()
 	local name = vim.api.nvim_buf_get_name(buf)
 
 	if name == "" or vim.bo[buf].buftype ~= "" then
-		local cwd = vim.fn.getcwd()
+		local cwd = vim.fn.expand("%:p")
 		local head = vim.fn
 			.system({
 				"git",
@@ -35,7 +35,7 @@ function M.get_branch()
 			:gsub("%s+", "")
 
 		if head then
-			return icons.branch .. " " .. head
+			return hl.text2 .. icons.branch .. " " .. head .. hl.reset
 		end
 		return nil
 	end

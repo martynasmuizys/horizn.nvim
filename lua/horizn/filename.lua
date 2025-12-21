@@ -4,34 +4,22 @@ local devicons = require("nvim-web-devicons")
 
 local M = {}
 
-local start
-local base
+local cwd
 
 function M.setup()
-	start = vim.fn.getcwd(-1, -1)
-	base = vim.fn.fnamemodify(start, ":t")
+	cwd = vim.fn.expand("%:p")
 end
 
-function M.get_filename()
+function M.get_filename(buf)
 	local filetype = vim.bo.filetype
 	if filetype == "netrw" then
-		local full = vim.api.nvim_buf_get_name(0)
+		local full = vim.api.nvim_buf_get_name(buf)
 
 		if full == "" then
-			return " " .. hl.text .. icons.netrw .. " " .. base .. hl.reset
+			return " " .. hl.text .. icons.netrw .. " " .. cwd .. hl.reset
 		end
 
-		local start_norm = start
-		if start_norm:sub(-1) ~= "/" then
-			start_norm = start_norm .. "/"
-		end
-
-		if full:sub(1, #start_norm) ~= start_norm then
-			return " " .. hl.text .. icons.netrw .. " " .. full .. hl.reset
-		end
-
-		local rel = full:sub(#start_norm + 1)
-		return " " .. hl.text .. icons.netrw .. " " .. base .. "/" .. rel .. hl.reset
+		return " " .. hl.text .. icons.netrw .. " " .. full .. hl.reset
 	end
 
 	local fname = vim.api.nvim_buf_get_name(0)
