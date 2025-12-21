@@ -22,8 +22,8 @@ local function init()
 	if vim.api.nvim_buf_is_valid(buf) then
 		s.state[buf] = s.state[buf] or {}
 		d.async_update(buf)
+		git.get_branch(buf)
 		s.state[buf].fname = f.get_filename()
-		s.state[buf].git_branch = git.get_branch(buf)
 		s.last_render = build(s.state[buf], buf)
 		M.render = render
 	end
@@ -53,8 +53,8 @@ function M.setup(opts)
 				s.state[args.buf] = s.state[args.buf] or {}
 
 				d.async_update(args.buf)
+				git.get_branch(args.buf)
 				s.state[args.buf].fname = f.get_filename(args.buf)
-				s.state[args.buf].git_branch = git.get_branch(args.buf)
 			end
 		end,
 	})
