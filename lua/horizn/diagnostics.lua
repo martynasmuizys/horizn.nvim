@@ -27,47 +27,46 @@ function M.get_diagnostics(buf)
 	return test
 end
 
-function M.async_update(buf)
-	vim.schedule(function()
-		if not vim.api.nvim_buf_is_valid(buf) then
-			return
+local function parse(diags)
+	local count = { h = 0, w = 0, e = 0 }
+
+	for _, d in ipairs(diags) do
+		if d.severity == 1 then
+			count.e = count.e + 1
+		elseif d.severity == 2 then
+			count.w = count.w + 1
+		elseif d.severity == 4 then
+			count.h = count.h + 1
 		end
+	end
 
-		local diags = vim.diagnostic.get(buf)
-		local count = { h = 0, w = 0, e = 0 }
-
-		for _, d in ipairs(diags) do
-			if d.severity == 1 then
-				count.e = count.e + 1
-			elseif d.severity == 2 then
-				count.w = count.w + 1
-			elseif d.severity == 4 then
-				count.h = count.h + 1
-			end
-		end
-
-		s.state[buf] = s.state[buf] or {}
-		s.state[buf].diagnostics = count
-		vim.cmd("redrawstatus")
-	end)
+	return count
 end
 
 function M.setup()
-	local grp = vim.api.nvim_create_augroup("HoriznGroup", { clear = false })
+	local grp = vim.api.nvim_create_augroup("Horizn", { clear = false })
 
 	vim.api.nvim_create_autocmd({ "InsertLeave" }, {
 		group = grp,
 		callback = function(args)
-			M.async_update(args.buf)
+			local count = parse(vim.diagnostic.get(args.buf))
+			s.state[args.buf] = s.state[args.buf] or {}
+			s.state[args.buf].diagnostics = count
+			vim.api.nvim_exec_autocmds("User", { group = grp, pattern = "StatuslineUpdate" })
 		end,
 	})
 	vim.api.nvim_create_autocmd({ "DiagnosticChanged" }, {
 		group = grp,
 		callback = function(args)
-			if vim.api.nvim_get_mode().mode:match("^i") then
+			local mode = vim.api.nvim_get_mode().mode
+			if mode:match("^i") then
 				return
 			end
-			M.async_update(args.buf)
+
+			local count = parse(args.data.diagnostics)
+			s.state[args.buf] = s.state[args.buf] or {}
+			s.state[args.buf].diagnostics = count
+			vim.api.nvim_exec_autocmds("User", { group = grp, pattern = "StatuslineUpdate" })
 		end,
 	})
 end
