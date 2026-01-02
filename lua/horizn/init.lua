@@ -73,11 +73,10 @@ build = function(state, buf, type)
 		state.fname,
 	}
 
-	if config.diagnostics then
-		table.insert(line, d.get_diagnostics(buf))
-	end
-
 	if type ~= "wb" then
+		if config.diagnostics then
+			table.insert(line, d.get_diagnostics(buf))
+		end
 		table.insert(line, hl.groups.text2 .. "%=")
 		table.insert(line, "[" .. vim.bo[buf].filetype .. "]")
 		table.insert(line, "%3l:%-3c %4P" .. hl.groups.reset)
