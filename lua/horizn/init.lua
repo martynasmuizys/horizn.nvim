@@ -96,8 +96,6 @@ function M.render(type)
 	if bt == "nofile" then
 		vim.opt_local.statusline = " "
 		return s.last_render
-	elseif bt ~= "" then
-		return s.last_render
 	end
 
 	local buf = vim.api.nvim_get_current_buf()
