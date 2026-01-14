@@ -58,11 +58,11 @@ function M.setup(opts)
 		callback = function()
 			local ft = vim.o.filetype
 			if ft == "oil" then
-				vim.opt.winbar = M.render("wb")
-				vim.opt.statusline = " "
+				vim.wo.winbar = M.render("wb")
+				vim.wo.statusline = " "
 			else
-				vim.opt.statusline = M.render("sl")
-				vim.opt.winbar = ""
+				vim.wo.statusline = M.render("sl")
+				vim.wo.winbar = ""
 			end
 		end,
 	})
